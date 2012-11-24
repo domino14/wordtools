@@ -14,6 +14,7 @@ private:
     QStringList findReverseAnagrams(QString str);
     QStringList findAnagrams(QString str);
     QStringList build(QString str);
+    void findSubwordsSubloop(QString toCheck, QString leftoverStr, QSet<QString> &result);
 public slots:
     void run();
 signals:

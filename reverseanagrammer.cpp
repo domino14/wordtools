@@ -2,6 +2,9 @@
 #include <QtAlgorithms>
 #include <QSet>
 
+int pruned = 0;
+int followed = 0;
+
 bool lengthLessThan(const QString &s1, const QString &s2)
 {
     return s1.length() < s2.length();
@@ -45,18 +48,38 @@ QStringList ReverseAnagrammer::build(QString str)
     return resultList;
 }
 
+void ReverseAnagrammer::findSubwordsSubloop(QString toCheck, QString leftoverStr, QSet<QString> &result)
+{
+    bool shouldCheck = true;
+    if (this->dawg->findPartialWord(toCheck) == NULL_NODE) {
+        pruned++;
+        shouldCheck = false;
+    }
+    followed++;
+    if (shouldCheck) {
+        findSubwords(leftoverStr, toCheck, result);
+    }
+}
+
 void ReverseAnagrammer::findSubwords(QString str, QString substr, QSet<QString> &result)
 {
     if (this->dawg->findWord(substr)) {
         result.insert(substr);
-    } else {
     }
     QString toCheck;
     QString leftoverStr;
     for (int i = 0; i < str.length(); i++) {
-        toCheck = substr + str[i];
         leftoverStr = str.mid(0, i) + str.mid(i+1);
-        findSubwords(leftoverStr, toCheck, result);
+        if (str[i] == '?') {
+            for (int j = 0; j < 26; j++) {
+                toCheck = substr + ('a' + j);
+                findSubwordsSubloop(toCheck, leftoverStr, result);
+            }
+        }
+        else {
+            toCheck = substr + str[i];
+            findSubwordsSubloop(toCheck, leftoverStr, result);
+        }
     }
 }
 
@@ -80,6 +103,6 @@ void ReverseAnagrammer::run() {
     foreach (QString result, results) {
         qDebug(result.toAscii());
     }
-
+    qDebug() << results.length() << "total words";
     emit finished();
 }
