@@ -11,7 +11,7 @@ public:
 private:
     Dawg *dawg;
     void findSubwords(QString str, QString substr, QSet<QString> &result);
-    QStringList findReverseAnagrams(QString str);
+    QStringList findReverseAnagrams(QString str, int rackLength);
     QStringList findAnagrams(QString str);
     QStringList build(QString str);
     void findSubwordsSubloop(QString toCheck, QString leftoverStr, QSet<QString> &result);

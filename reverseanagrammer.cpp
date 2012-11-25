@@ -5,6 +5,29 @@
 int pruned = 0;
 int followed = 0;
 
+QString letters = "AAAAAAAAABBCCDDDDEEEEEEEEEEEEFFGGGHHIIIIIIIIIJKLLLLMMNNNNNNOOOOOOOOPPQRRRRRRSSSSTTTTTTUUUUVVWWXYYZ";
+//QString letters = "AAB";
+// 2484184 distinct racks without the blank
+// 3199724 with the blank
+// http://math.stackexchange.com/questions/243685/how-many-possible-scrabble-racks-are-there-at-the-beginning-of-the-game
+void genLetterCombinations(QString n, int k, QSet<QString> &combinations, QString soFar) {
+   // qDebug() << "Called with" << n << k << soFar;
+    // choose k from n letters
+    if (soFar.length() == k) {
+        combinations.insert(soFar);
+        if (combinations.size() % 10000 == 0) {
+            qDebug() << "Combinations so far:" << combinations.size();
+        }
+        return;
+    }
+    for (int i = 0; i < n.length(); i++) {
+        QString modified = n;
+        modified = modified.mid(i+1);
+       // qDebug() << i;
+        genLetterCombinations(modified, k, combinations, soFar + n[i]);
+    }
+}
+
 bool lengthLessThan(const QString &s1, const QString &s2)
 {
     return s1.length() < s2.length();
@@ -15,15 +38,28 @@ ReverseAnagrammer::ReverseAnagrammer(QObject* parent) : QObject(parent)
 {
 }
 
-QStringList ReverseAnagrammer::findReverseAnagrams(QString str)
+QStringList ReverseAnagrammer::findReverseAnagrams(QString str, int rackLength)
 {
-    qDebug() << "Finding reverse anagrams for " << str;
-
+    qDebug() << "Finding reverse anagrams for " << str << rackLength;
+    /* a reverse anagram finder
+        revanag KENJI 7 will find all 7-letter racks that go with KENJI to make an 8.*/
+    // first, must generate all possible racks of length rackLength
+    QSet <QString> combos;
+    genLetterCombinations(letters, rackLength, combos, "");
+    qDebug() << "number of combos" << combos.size();
+    QList <QString> combosList = combos.toList();
+    QFile file("combos_.txt");
+    file.open(QIODevice::WriteOnly);
+    QTextStream out(&file);
+    foreach (QString combo, combosList) {
+        out << combo << "\n";
+    }
+    file.close();
+    return QStringList();
 }
 
 QStringList ReverseAnagrammer::findAnagrams(QString str)
 {
-    QStringList ret;
     qDebug() << "Finding anagrams for " << str;
     QSet<QString> result;
     QStringList resultList;
@@ -98,7 +134,7 @@ void ReverseAnagrammer::run() {
     }
 
     if (arguments[1] == "revanag") {
-        results = findReverseAnagrams(arguments[2]);
+        results = findReverseAnagrams(arguments[2], arguments[3].toInt());
     }
     foreach (QString result, results) {
         qDebug(result.toAscii());
