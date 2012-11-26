@@ -16,6 +16,8 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp dawg.cpp \
-    reverseanagrammer.cpp
+    reverseanagrammer.cpp \
+    utilities.cpp
 HEADERS += dawg.h \
-    reverseanagrammer.h
+    reverseanagrammer.h \
+    utilities.h

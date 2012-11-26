@@ -2,6 +2,7 @@
 #define REVERSEANAGRAMMER_H
 #include "dawg.h"
 #include <QObject>
+#include "utilities.h"
 
 class ReverseAnagrammer : public QObject
 {
@@ -15,6 +16,9 @@ private:
     QStringList findAnagrams(QString str);
     QStringList build(QString str);
     void findSubwordsSubloop(QString toCheck, QString leftoverStr, QSet<QString> &result);
+    Utilities utilities;
+    void test();
+    void generateLiveRacks(int rackLength, int withBlanks);
 public slots:
     void run();
 signals:
