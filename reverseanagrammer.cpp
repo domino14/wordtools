@@ -32,9 +32,18 @@ bool lengthLessThan(const QString &s1, const QString &s2)
     return s1.length() < s2.length();
 }
 
-bool probLessThan(const QPair<QString, double> &a1, const QPair<QString, double> &a2)
+struct Rack {
+    QString letters;
+    double combinations;
+    QString goesWith;
+    Rack(QString _letters, double _combinations, QString _goesWith) : letters(_letters),
+        combinations(_combinations),
+        goesWith(_goesWith) {}
+};
+
+bool probLessThan(const Rack &a1, const Rack &a2)
 {
-    return a1.second > a2.second;
+    return a1.combinations > a2.combinations;
 }
 
 
@@ -59,12 +68,12 @@ void generateUniqueRacks(bool blank) {
     }
 }
 
-void writeToFile(QList<QPair<QString, double> > racks, QString filename) {
+void writeToFile(QList<Rack> racks, QString filename) {
     QFile file(filename);
     file.open(QIODevice::WriteOnly);
     QTextStream out(&file);
     for (int i = 0; i < racks.length(); i++) {
-        out << racks[i].first << "\t" << racks[i].second << "\n";
+        out << racks[i].letters << "\t" << racks[i].combinations << "\t" << racks[i].goesWith << "\n";
     }
     file.close();
 }
@@ -85,18 +94,28 @@ void ReverseAnagrammer::generateLiveRacks(int rackLength, int withBlanks) {
     file.close();
 
     // racks contains all unique racks of this length
-    QList <QPair<QString, double> > liveracks;
-    QList <QPair<QString, double> > deadracks;
+
+    QList <Rack> liveracks;
+    QList <Rack> deadracks;
     foreach (QString rack, racks) {
         double combinations = utilities.combinations(rack);
-        if (findAnagrams(rack + '?').length() != 0) {
-            liveracks.append(qMakePair(rack, combinations));
+        // check with all letters
+        bool found = false;
+        QString goesWith;
+        for (char i = 'A'; i <= 'Z'; i++) {
+            if (findAnagrams(rack + i).length() != 0) {
+                found = true;
+                goesWith += i;
+            }
+        }
+        if (found) {
+            liveracks.append(Rack(rack, combinations, goesWith));
             if (liveracks.size() % 5000 == 0) {
                 qDebug() << "Found" << liveracks.size() << "live racks of this length so far";
             }
         }
         else {
-            deadracks.append(qMakePair(rack, combinations));
+            deadracks.append(Rack(rack, combinations, goesWith));   // of course goesWith is empty
         }
     }
     qSort(liveracks.begin(), liveracks.end(), probLessThan);

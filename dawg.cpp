@@ -23,7 +23,6 @@ Dawg::Dawg()
 
 void Dawg::readDawg(QString filename)
 {
-    qDebug() << "in readDawg";
     /* reads a dawg that was created with my makedawg.py script    */
     nodes.clear();
     QFile file(filename);
@@ -37,7 +36,6 @@ void Dawg::readDawg(QString filename)
         ints.append(integer);
     }
     file.close();
-    qDebug() << ints.size() << "nodes read from " << filename;
     bool endOfNext;
     QChar letter;
     bool endOfWord;
