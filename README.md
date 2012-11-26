@@ -1,4 +1,6 @@
 Some generic word tools. Requires Qt to build (latest version is best). Check downloads section for pre-packaged binaries.
+Downloads section also has a set of files needed to run these scripts (.trie file for words and pre-compiled text files
+with live/dead racks, etc.)
 
 If you have any submissions to make these scripts faster, please go ahead!
 
